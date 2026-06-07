@@ -1,0 +1,1275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Veo 3 Studio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=JetBrains+Mono:wght@300;400;500&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+  <script src="https://js.puter.com/v2/"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; }
+    :root {
+      --bg: #0a090e;
+      --bg2: #0f0e14;
+      --card: rgba(255,255,255,0.034);
+      --border: rgba(220,180,60,0.12);
+      --gold: #dcb43c;
+      --text: #ededf2;
+      --muted: #5a586e;
+      --sub: #8a8aa6;
+      --ff-d: 'Cormorant Garamond', serif;
+      --ff-m: 'JetBrains Mono', monospace;
+      --ff-b: 'Instrument Sans', sans-serif;
+    }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--ff-b);
+      min-height: 100vh;
+    }
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-thumb { background: rgba(220,180,60,0.25); border-radius: 2px; }
+    @keyframes shimmer { from{transform:translateX(-120%)} to{transform:translateX(320%)} }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+    @keyframes spin { to{transform:rotate(360deg)} }
+    .app { min-height: 100vh; background: var(--bg); position: relative; overflow-x: hidden; }
+    .glow1, .glow2 { position: fixed; pointer-events: none; z-index: 0; }
+    .glow1 { top: -25%; left: -15%; width: 55%; height: 55%; background: radial-gradient(ellipse, rgba(220,180,60,0.055) 0%, transparent 65%); }
+    .glow2 { bottom: -20%; right: -10%; width: 50%; height: 50%; background: radial-gradient(ellipse, rgba(80,100,240,0.04) 0%, transparent 65%); }
+    .scan-wrap { position: fixed; inset: 0; overflow: hidden; pointer-events: none; z-index: 0; }
+    .scan-line { position: absolute; left: 0; width: 100%; height: 2px; background: linear-gradient(90deg, transparent, rgba(220,180,60,0.04), transparent); animation: scanline 8s linear infinite; }
+    @keyframes scanline { 0%{transform:translateY(-100%)} 100%{transform:translateY(100vh)} }
+    .grain-svg { position: fixed; inset: 0; width: 100%; height: 100%; opacity: 0.028; pointer-events: none; z-index: 1; }
+    .container { max-width: 1080px; margin: 0 auto; padding: 0 24px; position: relative; z-index: 2; }
+    .header {
+      padding: 32px 0 22px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    .logo { font-family: var(--ff-d); font-size: 44px; font-weight: 300; letter-spacing: 0.07em; line-height: 1; }
+    .logo-accent { color: var(--gold); }
+    .logo-light { color: rgba(237,237,242,0.5); font-weight: 300; }
+    .tagline { font-family: var(--ff-m); font-size: 9px; letter-spacing: 0.3em; color: var(--muted); text-transform: uppercase; margin-top: 6px; }
+    .badge { font-family: var(--ff-m); font-size: 9px; letter-spacing: 0.15em; text-transform: uppercase; padding: 6px 12px; border: 1px solid var(--border); color: var(--muted); background: var(--card); white-space: nowrap; }
+    .notice {
+      background: rgba(220,180,60,0.05);
+      border: 1px solid rgba(220,180,60,0.18);
+      padding: 12px 16px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+    .notice-icon { color: var(--gold); font-size: 14px; margin-top: 1px; flex-shrink: 0; }
+    .notice p { font-family: var(--ff-m); font-size: 11px; letter-spacing: 0.04em; color: var(--sub); line-height: 1.65; }
+    .notice strong { color: var(--gold); }
+
+  .auth-bar {
+    margin-bottom: 24px;
+    padding: 12px 14px;
+    border: 1px solid var(--border);
+    background: rgba(255,255,255,0.02);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .auth-copy { display: flex; flex-direction: column; gap: 4px; }
+  .auth-label {
+    font-family: var(--ff-m);
+    font-size: 9px;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .auth-state {
+    font-family: var(--ff-b);
+    font-size: 13px;
+    color: var(--sub);
+  }
+  .auth-btn {
+    background: var(--gold);
+    color: #0a090e;
+    border: none;
+    padding: 10px 14px;
+    font-family: var(--ff-m);
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+  .auth-btn:hover { filter: brightness(1.05); }
+  .auth-btn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+    .tab-bar {
+      display: flex;
+      gap: 0;
+      margin-bottom: 22px;
+      border-bottom: 1px solid var(--border);
+      overflow-x: auto;
+    }
+    .tab-btn {
+      background: none;
+      border: none;
+      padding: 12px 18px;
+      cursor: pointer;
+      font-family: var(--ff-m);
+      font-size: 10px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--muted);
+      position: relative;
+      transition: color 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      white-space: nowrap;
+    }
+    .tab-btn.active { color: var(--gold); }
+    .tab-btn.active::after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: var(--gold);
+    }
+    .grid { display: grid; grid-template-columns: 1fr 280px; gap: 18px; align-items: start; }
+    @media (max-width: 860px) { .grid { grid-template-columns: 1fr; } .logo { font-size: 32px; } }
+    .card { background: var(--card); border: 1px solid var(--border); padding: 20px; }
+    .card + .card { margin-top: 14px; }
+    .card-label {
+      font-family: var(--ff-m);
+      font-size: 9px;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+    }
+    .status-line {
+      margin-top: 12px;
+      padding: 10px 12px;
+      border: 1px solid rgba(220,180,60,0.1);
+      background: rgba(220,180,60,0.03);
+      font-family: var(--ff-m);
+      font-size: 10px;
+      letter-spacing: 0.04em;
+      color: var(--sub);
+      line-height: 1.6;
+    }
+    .upload-zone {
+      display: block;
+      border: 1px dashed rgba(220,180,60,0.22);
+      cursor: pointer;
+      margin-bottom: 14px;
+      overflow: hidden;
+      transition: border-color 0.2s, background 0.2s;
+      background: rgba(255,255,255,0.015);
+      position: relative;
+    }
+    .upload-zone:hover { border-color: rgba(220,180,60,0.5); background: rgba(220,180,60,0.025); }
+    .upload-zone input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+    .upload-inner { padding: 34px 18px; text-align: center; }
+    .upload-icon  { font-size: 30px; color: var(--muted); margin-bottom: 10px; display: block; }
+    .upload-text  { font-size: 13px; color: var(--sub); line-height: 1.5; }
+    .upload-hint  { font-family: var(--ff-m); font-size: 9px; color: var(--muted); margin-top: 6px; letter-spacing: 0.12em; }
+    .upload-preview { width: 100%; display: block; object-fit: cover; border-radius: 2px; }
+    .upload-preview.landscape { aspect-ratio: 16/9; }
+    .upload-preview.portrait { aspect-ratio: 9/16; }
+    .textarea, textarea {
+      width: 100%;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid var(--border);
+      padding: 13px 14px;
+      color: var(--text);
+      font-family: var(--ff-b);
+      font-size: 13.5px;
+      line-height: 1.65;
+      resize: vertical;
+      min-height: 132px;
+      outline: none;
+      display: block;
+      transition: border-color 0.2s;
+    }
+    textarea:focus { border-color: rgba(220,180,60,0.35); }
+    textarea::placeholder { color: var(--muted); }
+    textarea.neg { min-height: 68px; font-size: 12px; }
+    .char-row { display: flex; justify-content: space-between; gap: 10px; align-items: flex-start; margin-top: 6px; }
+    .char-count { font-family: var(--ff-m); font-size: 9px; color: var(--muted); margin-left: auto; }
+    .suggestions { display: flex; flex-wrap: wrap; gap: 6px; margin-right: 10px; }
+    .sugg-chip, .chip-btn, .ar-btn, .select-btn, .seed-new, .action-btn, .mini-btn {
+      background: none;
+      border: 1px solid var(--border);
+      cursor: pointer;
+      transition: all 0.15s;
+      color: var(--muted);
+      font-family: var(--ff-m);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+    .sugg-chip {
+      padding: 4px 9px;
+      font-size: 11px;
+      font-family: var(--ff-b);
+      letter-spacing: 0;
+      text-transform: none;
+    }
+    .sugg-chip:hover, .chip-btn:hover, .ar-btn:hover, .seed-new:hover, .action-btn:hover, .mini-btn:hover { border-color: rgba(220,180,60,0.3); color: var(--sub); }
+    .gen-btn {
+      width: 100%;
+      background: var(--gold);
+      border: none;
+      padding: 15px;
+      cursor: pointer;
+      font-family: var(--ff-m);
+      font-size: 11px;
+      letter-spacing: 0.28em;
+      text-transform: uppercase;
+      color: #0a090e;
+      font-weight: 500;
+      margin-top: 14px;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    .gen-btn:hover:not(:disabled) { background: #f0c84f; transform: translateY(-1px); box-shadow: 0 4px 20px rgba(220,180,60,0.25); }
+    .gen-btn:disabled { background: rgba(220,180,60,0.22); cursor: not-allowed; color: rgba(10,9,14,0.4); }
+    .btn-shine { position: absolute; top: 0; left: -100%; width: 60%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent); animation: shimmer 2.5s infinite; }
+    .spinner {
+      display: inline-block;
+      width: 12px;
+      height: 12px;
+      border: 1.5px solid rgba(10,9,14,0.3);
+      border-top-color: #0a090e;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+    .progress-area { margin-top: 14px; }
+    .progress-header { display: flex; justify-content: space-between; margin-bottom: 8px; }
+    .progress-label { font-family: var(--ff-m); font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); }
+    .progress-pct { font-family: var(--ff-m); font-size: 11px; color: var(--gold); }
+    .progress-track { height: 2px; background: var(--border); position: relative; overflow: hidden; }
+    .progress-fill { height: 100%; background: linear-gradient(90deg, rgba(220,180,60,0.5), var(--gold)); transition: width 0.25s ease; width: 0%; }
+    .progress-glow { position: absolute; top: -2px; right: 0; width: 24px; height: 6px; background: var(--gold); filter: blur(6px); opacity: 0.8; animation: pulse 1s infinite; }
+    .steps-list { margin-top: 10px; display: flex; flex-direction: column; gap: 5px; }
+    .step-row { display: flex; align-items: center; gap: 9px; }
+    .step-dot { width: 4px; height: 4px; background: var(--muted); border-radius: 50%; flex-shrink: 0; transition: all 0.3s; }
+    .step-dot.active { background: var(--gold); box-shadow: 0 0 5px rgba(220,180,60,0.6); animation: pulse 1s infinite; }
+    .step-label { font-family: var(--ff-m); font-size: 9px; letter-spacing: 0.1em; color: var(--muted); transition: color 0.3s; }
+    .step-label.active { color: var(--sub); }
+    .output-card {
+      border: 1px solid var(--border);
+      background: var(--card);
+      overflow: hidden;
+      animation: fadeUp 0.45s ease;
+      margin-top: 16px;
+    }
+    .output-header {
+      padding: 11px 18px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+    .output-title {
+      font-family: var(--ff-m);
+      font-size: 9px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--gold);
+    }
+    .output-actions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+    .action-btn, .mini-btn, .seed-new {
+      padding: 6px 10px;
+      font-size: 9px;
+    }
+    .video-shell { background: #000; overflow: hidden; position: relative; }
+    .video-shell.landscape { aspect-ratio: 16/9; }
+    .video-shell.portrait { aspect-ratio: 9/16; max-width: 320px; margin: 0 auto; }
+    .video-placeholder {
+      width: 100%;
+      height: 100%;
+      min-height: 260px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 16px;
+      background: #050508;
+      position: relative;
+      overflow: hidden;
+      text-align: center;
+      padding: 20px;
+    }
+    .video-grad1, .video-grad2 { position: absolute; inset: 0; }
+    .video-grad1 { background: radial-gradient(ellipse at 30% 40%, rgba(220,180,60,0.07) 0%, transparent 55%); }
+    .video-grad2 { background: radial-gradient(ellipse at 75% 65%, rgba(80,100,240,0.05) 0%, transparent 55%); }
+    .play-btn {
+      width: 58px; height: 58px; border-radius: 50%;
+      border: 1.5px solid rgba(220,180,60,0.48);
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(220,180,60,0.06);
+      position: relative; z-index: 1;
+    }
+    .play-triangle {
+      width: 0; height: 0;
+      border-style: solid;
+      border-width: 9px 0 9px 17px;
+      border-color: transparent transparent transparent var(--gold);
+      margin-left: 3px;
+    }
+    .video-meta { position: relative; z-index: 1; }
+    .video-title {
+      font-family: var(--ff-d);
+      font-style: italic;
+      font-size: 18px;
+      color: rgba(255,255,255,0.72);
+      letter-spacing: 0.04em;
+    }
+    .video-sub {
+      font-family: var(--ff-m);
+      font-size: 9px;
+      color: var(--muted);
+      letter-spacing: 0.14em;
+      margin-top: 5px;
+      text-transform: uppercase;
+    }
+    .demo-watermark {
+      position: absolute;
+      bottom: 10px;
+      right: 12px;
+      z-index: 1;
+      font-family: var(--ff-m);
+      font-size: 8px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: rgba(220,180,60,0.25);
+    }
+    .video-generated {
+      width: 100%;
+      height: 100%;
+      display: block;
+      background: #000;
+      object-fit: contain;
+    }
+    .right-col { display: flex; flex-direction: column; gap: 14px; }
+    .ar-row, .chip-row { display: flex; gap: 8px; }
+    .ar-row { border: 1px solid var(--border); overflow: hidden; }
+    .ar-btn {
+      flex: 1;
+      background: none;
+      border: none;
+      padding: 12px 8px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 7px;
+      font-family: var(--ff-m);
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+    }
+    .ar-btn.active { background: rgba(220,180,60,0.07); color: var(--gold); }
+    .ar-vis { border: 1.5px solid currentColor; opacity: 0.6; transition: opacity 0.2s; }
+    .ar-btn.active .ar-vis { opacity: 1; }
+    .ar-vis.land { width: 28px; height: 16px; }
+    .ar-vis.port { width: 16px; height: 28px; }
+    .chip-wrap { display: flex; flex-wrap: wrap; gap: 6px; }
+    .chip-btn {
+      flex: 1;
+      min-width: 76px;
+      padding: 7px 8px;
+      font-size: 9px;
+    }
+    .chip-btn.active {
+      background: rgba(220,180,60,0.07);
+      border-color: rgba(220,180,60,0.38);
+      color: var(--gold);
+    }
+    .select, .seed-input {
+      width: 100%;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid var(--border);
+      padding: 10px 12px;
+      color: var(--text);
+      font-family: var(--ff-m);
+      font-size: 11px;
+      outline: none;
+    }
+    .select option { background: #111018; }
+    .seed-row { display: flex; gap: 8px; align-items: center; }
+    .seed-input { flex: 1; }
+    .footer {
+      padding: 22px 0 32px;
+      border-top: 1px solid var(--border);
+      margin-top: 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .footer-text { font-family: var(--ff-m); font-size: 9px; letter-spacing: 0.12em; color: var(--muted); }
+    .hidden { display: none !important; }
+    .note {
+      font-family: var(--ff-m);
+      font-size: 9px;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+      line-height: 1.5;
+      margin-top: 8px;
+    }
+    .small-row { display: flex; justify-content: space-between; gap: 10px; align-items: center; }
+    .range-wrap { margin-top: 8px; }
+    input[type=range] { -webkit-appearance: none; appearance: none; width: 100%; height: 2px; background: var(--border); border-radius: 1px; outline: none; cursor: pointer; }
+    input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; background: var(--gold); border-radius: 50%; cursor: pointer; box-shadow: 0 0 0 3px rgba(220,180,60,0.15); }
+    .duration-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+    .duration-value { font-family: var(--ff-m); font-size: 18px; color: var(--gold); letter-spacing: -0.02em; }
+    .duration-unit { font-size: 10px; color: var(--sub); margin-left: 2px; }
+    .dur-ticks { display: flex; justify-content: space-between; margin-top: 4px; }
+    .dur-tick { font-family: var(--ff-m); font-size: 9px; color: var(--muted); cursor: pointer; }
+    .dur-tick.active { color: var(--gold); }
+    .inline-switch {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-family: var(--ff-m);
+      font-size: 9px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--muted);
+      user-select: none;
+    }
+    .inline-switch input { accent-color: var(--gold); }
+    .error { color: #ffafaf; }
+  </style>
+</head>
+<body>
+<div class="app">
+  <div class="glow1"></div>
+  <div class="glow2"></div>
+  <div class="scan-wrap"><div class="scan-line"></div></div>
+  <svg class="grain-svg" xmlns="http://www.w3.org/2000/svg">
+    <filter id="grain">
+      <feTurbulence type="fractalNoise" baseFrequency="0.72" numOctaves="4" stitchTiles="stitch"/>
+      <feColorMatrix type="saturate" values="0"/>
+    </filter>
+    <rect width="100%" height="100%" filter="url(#grain)" opacity="1"/>
+  </svg>
+
+  <div class="container">
+    <header class="header">
+      <div>
+        <div class="logo">VEO<span class="logo-accent">3</span><span class="logo-light"> STUDIO</span></div>
+        <div class="tagline">GOOGLE VEO VIA PUTER.JS · NO API KEY REQUIRED</div>
+      </div>
+      <div class="badge">LIVE GENERATION</div>
+    </header>
+
+    <div class="notice">
+      <span class="notice-icon">◈</span>
+      <p>
+        Puter.js can call Veo from frontend JavaScript with no API key. The returned promise resolves to an
+        <strong>HTMLVideoElement</strong>, so the clip can be inserted directly into the page.
+      </p>
+    </div>
+    <div class="auth-bar">
+      <div class="auth-copy">
+        <div class="auth-label">Access</div>
+        <div class="auth-state" id="auth-state">Checking Puter access…</div>
+      </div>
+      <button class="auth-btn" id="sign-in-btn" type="button">Sign in with Puter</button>
+    </div>
+
+    <div class="tab-bar">
+      <button class="tab-btn active" data-tab="text"><span class="tab-icon">✦</span>Text to Video</button>
+      <button class="tab-btn" data-tab="image"><span class="tab-icon">◈</span>Image to Video</button>
+      <button class="tab-btn" data-tab="reference"><span class="tab-icon">◎</span>Reference to Video</button>
+    </div>
+
+    <div class="grid">
+      <div id="left-col">
+        <div class="card" id="input-card">
+          <div class="card-label" id="input-label">Describe your video</div>
+
+          <label class="upload-zone hidden" id="img-upload-zone">
+            <input type="file" accept="image/*" id="img-file-input"/>
+            <div class="upload-inner" id="img-upload-inner">
+              <span class="upload-icon">⊕</span>
+              <div class="upload-text">Drop or click to upload source image</div>
+              <div class="upload-hint">PNG · JPG · WebP · up to 50 MB</div>
+            </div>
+          </label>
+
+          <label class="upload-zone hidden" id="ref-upload-zone">
+            <input type="file" accept="image/*" multiple id="ref-file-input"/>
+            <div class="upload-inner" id="ref-upload-inner">
+              <span class="upload-icon">⊕</span>
+              <div class="upload-text">Drop or click to upload reference images</div>
+              <div class="upload-hint">Up to 3 images · PNG · JPG · WebP</div>
+            </div>
+          </label>
+
+          <div class="status-line" id="status-msg">Ready.</div>
+
+          <textarea id="prompt-ta" maxlength="1000" placeholder="A lone lighthouse on a storm-battered coast at dusk, waves crashing, cinematic lens flare, 4K..."></textarea>
+
+          <div class="char-row">
+            <div class="suggestions" id="suggestions">
+              <button class="sugg-chip" data-prompt="Aerial view of aurora borealis over arctic tundra at midnight">Aerial aurora at midnight</button>
+              <button class="sugg-chip" data-prompt="Slow macro drip of honey, golden hour, shallow depth of field">Macro honey drip</button>
+              <button class="sugg-chip" data-prompt="Empty brutalist concrete corridor, long shadows, dust particles">Brutalist corridor</button>
+              <button class="sugg-chip" data-prompt="Timelapse of storm clouds forming over mountain range">Storm timelapse</button>
+            </div>
+            <span class="char-count" id="char-count">0/1000</span>
+          </div>
+
+          <div style="margin-top:14px">
+            <div class="card-label" style="margin-bottom:8px">Negative Prompt</div>
+            <textarea class="neg" id="neg-ta" maxlength="400" placeholder="blurry, watermark, text overlay, low quality, distorted..."></textarea>
+          </div>
+
+          <button class="gen-btn" id="gen-btn" disabled>
+            <span class="btn-shine"></span>
+            Generate Video
+          </button>
+
+          <div class="progress-area hidden" id="progress-area">
+            <div class="progress-header">
+              <span class="progress-label">Generating</span>
+              <span class="progress-pct" id="progress-pct">0%</span>
+            </div>
+            <div class="progress-track">
+              <div class="progress-fill" id="progress-fill">
+                <div class="progress-glow"></div>
+              </div>
+            </div>
+            <div class="steps-list" id="steps-list"></div>
+          </div>
+        </div>
+
+        <div class="output-card hidden" id="output-card">
+          <div class="output-header">
+            <span class="output-title">✦ Generated Output</span>
+            <div class="output-actions">
+              <a class="action-btn" id="download-btn" href="#" download>↓ Download</a>
+              <button class="action-btn" id="open-btn">↗ Open</button>
+              <button class="action-btn" id="close-output-btn">✕</button>
+            </div>
+          </div>
+          <div class="video-shell landscape" id="video-shell">
+            <div class="video-placeholder" id="video-placeholder">
+              <div class="video-grad1"></div>
+              <div class="video-grad2"></div>
+              <button class="play-btn" aria-hidden="true">
+                <div class="play-triangle"></div>
+              </button>
+              <div class="video-meta">
+                <div class="video-title" id="video-title">Generated Video</div>
+                <div class="video-sub" id="video-sub">8s · cinematic · 16:9</div>
+              </div>
+              <div class="demo-watermark">VEO · LIVE</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="right-col">
+        <div class="card">
+          <div class="card-label">Aspect Ratio</div>
+          <div class="ar-row">
+            <button class="ar-btn active" data-ratio="16:9">
+              <div class="ar-vis land"></div>
+              16:9
+            </button>
+            <button class="ar-btn" data-ratio="9:16">
+              <div class="ar-vis port"></div>
+              9:16
+            </button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-label">Duration</div>
+          <div class="duration-row">
+            <span class="duration-value" id="dur-val">8<span class="duration-unit">s</span></span>
+            <span class="note">Veo 3.x supports 4, 6, 8 seconds.</span>
+          </div>
+          <input type="range" id="dur-range" min="4" max="8" step="2" value="8"/>
+          <div class="dur-ticks">
+            <span class="dur-tick" data-n="4">4</span>
+            <span class="dur-tick" data-n="6">6</span>
+            <span class="dur-tick active" data-n="8">8</span>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-label">Veo Model</div>
+          <select class="select" id="model-select">
+            <option value="google/veo-3.1-generate-preview">Veo 3.1</option>
+            <option value="google/veo-3.1-fast-generate-preview">Veo 3.1 Fast</option>
+            <option value="google/veo-3.1-lite-generate-preview">Veo 3.1 Lite</option>
+          </select>
+          <div class="note">This uses Puter’s documented Veo model names.</div>
+        </div>
+
+        <div class="card">
+          <div class="card-label">Output Size</div>
+          <select class="select" id="quality-select">
+            <option value="720p">720p</option>
+            <option value="1080p">1080p</option>
+            <option value="4k">4K</option>
+          </select>
+          <div class="note">1080p and 4K need an 8-second clip in Puter’s Veo options.</div>
+        </div>
+
+        <div class="card">
+          <div class="card-label">Visual Style</div>
+          <div class="chip-wrap">
+            <button class="chip-btn active" data-style="cinematic">cinematic</button>
+            <button class="chip-btn" data-style="anime">anime</button>
+            <button class="chip-btn" data-style="documentary">documentary</button>
+            <button class="chip-btn" data-style="surreal">surreal</button>
+            <button class="chip-btn" data-style="noir">noir</button>
+            <button class="chip-btn" data-style="photorealistic">photorealistic</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-label">Motion Intensity</div>
+          <div class="chip-row">
+            <button class="chip-btn" data-motion="subtle">subtle</button>
+            <button class="chip-btn active" data-motion="medium">medium</button>
+            <button class="chip-btn" data-motion="dynamic">dynamic</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-label">Test Mode</div>
+          <label class="inline-switch">
+            <input type="checkbox" id="test-mode" checked />
+            sample clip only
+          </label>
+          <div class="note">Useful for testing the UI without using credits.</div>
+        </div>
+
+        <div class="card">
+          <div class="card-label">Seed / Notes</div>
+          <div class="seed-row">
+            <input class="seed-input" id="seed-input" type="text" value="random" />
+            <button class="seed-new" id="seed-new-btn">⟳ New</button>
+          </div>
+          <div class="note">Seed is folded into the prompt text here; Puter’s Veo options do not expose a seed parameter.</div>
+        </div>
+      </div>
+    </div>
+
+    <footer class="footer">
+      <span class="footer-text">VEO 3 STUDIO · PUTER.JS FRONTEND</span>
+      <span class="footer-text">No API keys · no backend · generated clips appear directly in the browser</span>
+    </footer>
+  </div>
+</div>
+
+<script>
+  const state = {
+    tab: 'text',
+    ratio: '16:9',
+    duration: 8,
+    motion: 'medium',
+    style: 'cinematic',
+    quality: '720p',
+    model: 'google/veo-3.1-generate-preview',
+    generating: false,
+    progressTimer: null,
+    elapsedTimer: null,
+    sourceImage: null,
+    referenceImages: [],
+    currentVideoUrl: '',
+    currentObjectUrl: '',
+    signedIn: false,
+  };
+
+  const $ = (id) => document.getElementById(id);
+  const promptTa = $('prompt-ta');
+  const negTa = $('neg-ta');
+  const charCount = $('char-count');
+  const genBtn = $('gen-btn');
+  const progressArea = $('progress-area');
+  const progressFill = $('progress-fill');
+  const progressPct = $('progress-pct');
+  const stepsList = $('steps-list');
+  const outputCard = $('output-card');
+  const videoShell = $('video-shell');
+  const videoPlaceholder = $('video-placeholder');
+  const videoTitle = $('video-title');
+  const videoSub = $('video-sub');
+  const suggestions = $('suggestions');
+  const inputLabel = $('input-label');
+  const imgZone = $('img-upload-zone');
+  const refZone = $('ref-upload-zone');
+  const imgInput = $('img-file-input');
+  const refInput = $('ref-file-input');
+  const imgInner = $('img-upload-inner');
+  const refInner = $('ref-upload-inner');
+  const durRange = $('dur-range');
+  const durVal = $('dur-val');
+  const modelSelect = $('model-select');
+  const qualitySelect = $('quality-select');
+  const testMode = $('test-mode');
+  const signInBtn = $('sign-in-btn');
+  const authState = $('auth-state');
+  const seedInput = $('seed-input');
+  const seedNewBtn = $('seed-new-btn');
+  const statusMsg = $('status-msg');
+  const downloadBtn = $('download-btn');
+  const openBtn = $('open-btn');
+  const closeOutputBtn = $('close-output-btn');
+
+  const STEPS = [
+    { label: 'Parsing prompt & parameters', threshold: 10 },
+    { label: 'Submitting request to Puter', threshold: 22 },
+    { label: 'Synthesizing keyframes', threshold: 42 },
+    { label: 'Temporal coherence pass', threshold: 64 },
+    { label: 'Encoding final output', threshold: 84 },
+    { label: 'Preparing video element', threshold: 98 },
+  ];
+
+  const tabPlaceholders = {
+    text: 'A lone lighthouse on a storm-battered coast at dusk, waves crashing, cinematic lens flare, 4K...',
+    image: 'Describe the motion and atmosphere — camera movement, pace, mood...',
+    reference: 'How should this reference shape the output? Preserve the face, match the lighting...',
+  };
+  const tabLabels = {
+    text: 'Describe your video',
+    image: 'Source image + description',
+    reference: 'Reference images + prompt',
+  };
+
+  function setStatus(text, isError = false) {
+    statusMsg.textContent = text;
+    statusMsg.classList.toggle('error', isError);
+  }
+
+  function setPlaceholder(node, label) {
+    node.innerHTML = `
+      <span class="upload-icon">⊕</span>
+      <div class="upload-text">${label}</div>
+      <div class="upload-hint">PNG · JPG · WebP · up to 50 MB</div>
+    `;
+  }
+
+  function updateSteps(pct) {
+    STEPS.forEach((step, i) => {
+      const dot = document.getElementById(`step-dot-${i}`);
+      const lbl = document.getElementById(`step-lbl-${i}`);
+      const active = pct >= step.threshold;
+      if (dot) dot.classList.toggle('active', active);
+      if (lbl) lbl.classList.toggle('active', active);
+    });
+  }
+
+  function buildSteps() {
+    stepsList.innerHTML = '';
+    STEPS.forEach((step, i) => {
+      const row = document.createElement('div');
+      row.className = 'step-row';
+      row.innerHTML = `<span class="step-dot" id="step-dot-${i}"></span><span class="step-label" id="step-lbl-${i}">${step.label}</span>`;
+      stepsList.appendChild(row);
+    });
+  }
+
+  function updateDurationUI() {
+    durVal.innerHTML = `${state.duration}<span class="duration-unit">s</span>`;
+    document.querySelectorAll('.dur-tick').forEach(t => t.classList.toggle('active', Number(t.dataset.n) === state.duration));
+    durRange.value = String(state.duration);
+  }
+
+  function updateTabUI() {
+    promptTa.placeholder = tabPlaceholders[state.tab];
+    inputLabel.textContent = tabLabels[state.tab];
+    imgZone.classList.toggle('hidden', state.tab !== 'image');
+    refZone.classList.toggle('hidden', state.tab !== 'reference');
+    suggestions.classList.toggle('hidden', state.tab !== 'text' || promptTa.value.trim().length > 0);
+    checkGenBtn();
+  }
+
+  function getSize() {
+    if (state.ratio === '16:9') {
+      return state.quality === '4k' ? '3840x2160' : state.quality === '1080p' ? '1920x1080' : '1280x720';
+    }
+    return state.quality === '4k' ? '2160x3840' : state.quality === '1080p' ? '1080x1920' : '720x1280';
+  }
+
+  function enforceDurationRules() {
+    if (state.quality !== '720p') {
+      state.duration = 8;
+      updateDurationUI();
+    }
+  }
+
+  function updateAuthUI() {
+    const ready = window.puter && window.puter.auth && typeof window.puter.auth.isSignedIn === 'function';
+    if (!ready) {
+      authState.textContent = 'Loading Puter…';
+      signInBtn.disabled = true;
+      return;
+    }
+    state.signedIn = Boolean(window.puter.auth.isSignedIn());
+    authState.textContent = state.signedIn
+      ? 'Signed in to Puter.'
+      : 'Sign in for full generations. Sample mode can still test the UI.';
+    signInBtn.disabled = false;
+    signInBtn.textContent = state.signedIn ? 'Signed in' : 'Sign in with Puter';
+  }
+
+  async function signInWithPuter() {
+    if (!window.puter || !window.puter.auth || typeof window.puter.auth.signIn !== 'function') {
+      setStatus('Puter is still loading…', true);
+      return;
+    }
+    try {
+      signInBtn.disabled = true;
+      await window.puter.auth.signIn();
+      updateAuthUI();
+      checkGenBtn();
+      setStatus('Puter sign-in complete.');
+    } catch (err) {
+      console.error(err);
+      setStatus(err?.message || 'Puter sign-in failed.', true);
+    } finally {
+      updateAuthUI();
+    }
+  }
+
+  function checkGenBtn() {
+    const hasPrompt = promptTa.value.trim().length > 0;
+    const needsImage = state.tab === 'image' && !state.sourceImage;
+    const needsRef = state.tab === 'reference' && state.referenceImages.length === 0;
+    const ready = window.puter && window.puter.ai && typeof window.puter.ai.txt2vid === 'function';
+    const allowedByAuth = testMode.checked || state.signedIn;
+    const ok = !state.generating && hasPrompt && !needsImage && !needsRef && ready && allowedByAuth;
+    genBtn.disabled = !ok;
+    if (!ready) {
+      setStatus('Loading Puter.js…');
+    } else if (!hasPrompt) {
+      setStatus('Enter a prompt to enable generation.');
+    } else if (needsImage) {
+      setStatus('Upload a source image.');
+    } else if (needsRef) {
+      setStatus('Upload at least one reference image.');
+    } else if (!allowedByAuth) {
+      setStatus('Turn on sample mode or sign in with Puter.');
+    } else if (state.generating) {
+      setStatus('Generation in progress…');
+    } else {
+      setStatus('Ready.');
+    }
+  }
+
+  function clearVideoOutput() {
+    if (state.currentObjectUrl) {
+      URL.revokeObjectURL(state.currentObjectUrl);
+      state.currentObjectUrl = '';
+    }
+    state.currentVideoUrl = '';
+    videoShell.querySelectorAll('.video-generated').forEach(v => v.remove());
+    videoPlaceholder.classList.remove('hidden');
+    downloadBtn.href = '#';
+    openBtn.dataset.href = '';
+  }
+
+  function showGeneratedVideo(videoEl) {
+    clearVideoOutput();
+    videoPlaceholder.classList.add('hidden');
+
+    videoEl.classList.add('video-generated');
+    videoEl.controls = true;
+    videoEl.playsInline = true;
+    videoEl.autoplay = true;
+    videoEl.muted = false;
+
+    videoShell.appendChild(videoEl);
+
+    const src = videoEl.currentSrc || videoEl.src || videoEl.getAttribute('src') || '';
+    if (src) {
+      state.currentVideoUrl = src;
+      if (src.startsWith('blob:')) state.currentObjectUrl = src;
+      downloadBtn.href = src;
+      downloadBtn.download = 'veo-generated.mp4';
+      openBtn.dataset.href = src;
+      openBtn.disabled = false;
+    } else {
+      downloadBtn.href = '#';
+      openBtn.dataset.href = '';
+    }
+
+    videoEl.addEventListener('loadeddata', () => videoEl.play().catch(() => {}), { once: true });
+  }
+
+  function composePrompt() {
+    const base = promptTa.value.trim();
+    const negative = negTa.value.trim();
+    const seedNote = seedInput.value.trim() && seedInput.value.trim().toLowerCase() !== 'random' ? `Seed note: ${seedInput.value.trim()}.` : '';
+    const pieces = [
+      base,
+      `Style: ${state.style}.`,
+      `Motion: ${state.motion}.`,
+      `Aspect ratio: ${state.ratio}.`,
+      `Duration: ${state.duration} seconds.`,
+      seedNote,
+      negative ? `Avoid: ${negative}.` : '',
+    ].filter(Boolean);
+    return pieces.join(' ');
+  }
+
+  function stripDataUrl(dataUrl) {
+    const value = String(dataUrl || '');
+    return value.includes(',') ? value.split(',')[1] : value;
+  }
+
+  function fileToDataUrl(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onerror = () => reject(reader.error || new Error('Failed to read file.'));
+      reader.onload = () => resolve(String(reader.result || ''));
+      reader.readAsDataURL(file);
+    });
+  }
+
+  async function readSingleImage(file) {
+    const dataUrl = await fileToDataUrl(file);
+    return {
+      file,
+      dataUrl,
+      base64: stripDataUrl(dataUrl),
+      mimeType: file.type || 'image/png',
+    };
+  }
+
+  async function readReferenceImages(files) {
+    const picked = Array.from(files || []).slice(0, 3);
+    const results = [];
+    for (const file of picked) {
+      results.push(await readSingleImage(file));
+    }
+    return results;
+  }
+
+  function renderSinglePreview(inner, item, aspectClass, fallbackLabel) {
+    inner.innerHTML = '';
+    const img = document.createElement('img');
+    img.src = item.dataUrl;
+    img.className = `upload-preview ${aspectClass}`;
+    inner.appendChild(img);
+    if (!item) setPlaceholder(inner, fallbackLabel);
+  }
+
+  function renderReferencePreview(inner, items) {
+    inner.innerHTML = '';
+    if (!items.length) {
+      setPlaceholder(inner, 'Drop or click to upload reference images');
+      return;
+    }
+    const grid = document.createElement('div');
+    grid.style.display = 'grid';
+    grid.style.gridTemplateColumns = 'repeat(3, 1fr)';
+    grid.style.gap = '8px';
+    items.forEach((item, index) => {
+      const wrap = document.createElement('div');
+      wrap.style.position = 'relative';
+      wrap.style.border = '1px solid rgba(220,180,60,0.12)';
+      const img = document.createElement('img');
+      img.src = item.dataUrl;
+      img.className = 'upload-preview landscape';
+      img.style.aspectRatio = '1 / 1';
+      img.style.objectFit = 'cover';
+      const label = document.createElement('div');
+      label.textContent = `REF ${index + 1}`;
+      label.style.position = 'absolute';
+      label.style.bottom = '6px';
+      label.style.left = '6px';
+      label.style.padding = '3px 6px';
+      label.style.background = 'rgba(0,0,0,0.45)';
+      label.style.fontFamily = 'var(--ff-m)';
+      label.style.fontSize = '8px';
+      label.style.letterSpacing = '0.12em';
+      label.style.color = 'var(--gold)';
+      wrap.appendChild(img);
+      wrap.appendChild(label);
+      grid.appendChild(wrap);
+    });
+    inner.appendChild(grid);
+  }
+
+  async function runGeneration() {
+    if (!window.puter || !window.puter.ai || typeof window.puter.ai.txt2vid !== 'function') {
+      throw new Error('Puter.js is still loading. Try again in a moment.');
+    }
+
+    const prompt = composePrompt();
+    const options = {
+      model: state.model,
+      seconds: state.duration,
+      size: getSize(),
+      negative_prompt: negTa.value.trim() || undefined,
+      test_mode: testMode.checked || undefined,
+    };
+
+    if (state.tab === 'image' && state.sourceImage) {
+      options.input_reference = state.sourceImage.base64;
+    }
+
+    if (state.tab === 'reference' && state.referenceImages.length) {
+      options.reference_images = state.referenceImages.map(img => img.base64);
+    }
+
+    const cleanOptions = Object.fromEntries(Object.entries(options).filter(([, v]) => v !== undefined && v !== ''));
+    const videoEl = await window.puter.ai.txt2vid({ prompt, ...cleanOptions });
+    return videoEl;
+  }
+
+  function startTimers() {
+    let elapsed = 0;
+    progressFill.style.width = '12%';
+    progressPct.textContent = 'Waiting…';
+    state.elapsedTimer = setInterval(() => {
+      elapsed += 1;
+      progressPct.textContent = `${elapsed}s`;
+      const pct = Math.min(92, 12 + elapsed * 3);
+      progressFill.style.width = `${pct}%`;
+      updateSteps(pct);
+    }, 1000);
+  }
+
+  function stopTimers() {
+    if (state.elapsedTimer) clearInterval(state.elapsedTimer);
+    if (state.progressTimer) clearInterval(state.progressTimer);
+    state.elapsedTimer = null;
+    state.progressTimer = null;
+  }
+
+  async function generate() {
+    if (state.generating) return;
+    state.generating = true;
+    genBtn.disabled = true;
+    genBtn.innerHTML = '<span class="spinner"></span>Generating…';
+    progressArea.classList.remove('hidden');
+    buildSteps();
+    updateSteps(12);
+    startTimers();
+    setStatus('Submitting generation request…');
+    clearVideoOutput();
+    outputCard.classList.add('hidden');
+
+    try {
+      const videoEl = await runGeneration();
+      stopTimers();
+      progressFill.style.width = '100%';
+      progressPct.textContent = 'Done';
+      updateSteps(100);
+      showGeneratedVideo(videoEl);
+      const title = promptTa.value.trim();
+      videoTitle.textContent = title.length > 48 ? `${title.slice(0, 48)}…` : title;
+      videoSub.textContent = `${state.duration}s · ${state.style} · ${state.ratio} · ${state.model.replace('google/veo-', 'Veo ')}`;
+      outputCard.classList.remove('hidden');
+      outputCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      setStatus('Generation complete.');
+    } catch (err) {
+      console.error(err);
+      stopTimers();
+      progressFill.style.width = '0%';
+      progressPct.textContent = '0%';
+      setStatus(err?.message || 'Generation failed.', true);
+    } finally {
+      state.generating = false;
+      genBtn.innerHTML = '<span class="btn-shine"></span>Generate Video';
+      progressArea.classList.add('hidden');
+      checkGenBtn();
+    }
+  }
+
+  function bindTabs() {
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        state.tab = btn.dataset.tab;
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        updateTabUI();
+        outputCard.classList.add('hidden');
+      });
+    });
+  }
+
+  function bindChips() {
+    document.querySelectorAll('[data-style]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        state.style = btn.dataset.style;
+        document.querySelectorAll('[data-style]').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        checkGenBtn();
+      });
+    });
+
+    document.querySelectorAll('[data-motion]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        state.motion = btn.dataset.motion;
+        document.querySelectorAll('[data-motion]').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+      });
+    });
+
+    document.querySelectorAll('.dur-tick').forEach(t => {
+      t.addEventListener('click', () => {
+        state.duration = Number(t.dataset.n);
+        updateDurationUI();
+        enforceDurationRules();
+      });
+    });
+
+    document.querySelectorAll('.ar-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        state.ratio = btn.dataset.ratio;
+        document.querySelectorAll('.ar-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        videoShell.className = `video-shell ${state.ratio === '16:9' ? 'landscape' : 'portrait'}`;
+        if (state.quality !== '720p') enforceDurationRules();
+      });
+    });
+  }
+
+  function bindUploads() {
+    imgInput.addEventListener('change', async () => {
+      const file = imgInput.files && imgInput.files[0];
+      if (!file) {
+        state.sourceImage = null;
+        setPlaceholder(imgInner, 'Drop or click to upload source image');
+        checkGenBtn();
+        return;
+      }
+      state.sourceImage = await readSingleImage(file);
+      renderSinglePreview(imgInner, state.sourceImage, state.ratio === '16:9' ? 'landscape' : 'portrait', 'Drop or click to upload source image');
+      checkGenBtn();
+    });
+
+    refInput.addEventListener('change', async () => {
+      const files = Array.from(refInput.files || []);
+      if (!files.length) {
+        state.referenceImages = [];
+        setPlaceholder(refInner, 'Drop or click to upload reference images');
+        checkGenBtn();
+        return;
+      }
+      state.referenceImages = await readReferenceImages(files);
+      renderReferencePreview(refInner, state.referenceImages);
+      checkGenBtn();
+    });
+  }
+
+  function bindInputs() {
+    promptTa.addEventListener('input', () => {
+      charCount.textContent = `${promptTa.value.length}/1000`;
+      suggestions.classList.toggle('hidden', promptTa.value.trim().length > 0 || state.tab !== 'text');
+      checkGenBtn();
+    });
+
+    negTa.addEventListener('input', checkGenBtn);
+
+    document.querySelectorAll('.sugg-chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        promptTa.value = chip.dataset.prompt;
+        charCount.textContent = `${promptTa.value.length}/1000`;
+        suggestions.classList.add('hidden');
+        checkGenBtn();
+      });
+    });
+
+    durRange.addEventListener('input', () => {
+      state.duration = Number(durRange.value);
+      updateDurationUI();
+      enforceDurationRules();
+    });
+
+    modelSelect.addEventListener('change', () => {
+      state.model = modelSelect.value;
+      enforceDurationRules();
+    });
+
+    qualitySelect.addEventListener('change', () => {
+      state.quality = qualitySelect.value;
+      enforceDurationRules();
+    });
+
+    testMode.addEventListener('change', checkGenBtn);
+
+    seedNewBtn.addEventListener('click', () => {
+      seedInput.value = Math.floor(Math.random() * 9999999).toString();
+    });
+
+    seedInput.addEventListener('input', checkGenBtn);
+  }
+
+  genBtn.addEventListener('click', generate);
+
+  closeOutputBtn.addEventListener('click', () => outputCard.classList.add('hidden'));
+
+  openBtn.addEventListener('click', () => {
+    const href = openBtn.dataset.href;
+    if (href) window.open(href, '_blank', 'noopener,noreferrer');
+  });
+
+  bindTabs();
+  bindChips();
+  bindUploads();
+  bindInputs();
+  signInBtn.addEventListener('click', signInWithPuter);
+
+  qualitySelect.value = state.quality;
+  updateDurationUI();
+  updateTabUI();
+  setPlaceholder(imgInner, 'Drop or click to upload source image');
+  setPlaceholder(refInner, 'Drop or click to upload reference images');
+  charCount.textContent = '0/1000';
+  videoShell.className = `video-shell ${state.ratio === '16:9' ? 'landscape' : 'portrait'}`;
+
+  const puterReady = setInterval(() => {
+    if (window.puter && window.puter.ai && typeof window.puter.ai.txt2vid === 'function') {
+      clearInterval(puterReady);
+      updateAuthUI();
+      checkGenBtn();
+      setStatus('Ready.');
+    }
+  }, 250);
+
+  setTimeout(() => {
+    clearInterval(puterReady);
+    updateAuthUI();
+    checkGenBtn();
+  }, 8000);
+
+  updateAuthUI();
+  checkGenBtn();
+</script>
+</body>
+</html>
